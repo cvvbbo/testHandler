@@ -3,8 +3,10 @@ package com.t.testhandler;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textView = findViewById(R.id.tv);
-        testHandler1();
+        testHandler3();
 
     }
 
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                         super.handleMessage(msg);
                         switch (msg.what) {
                             case 1:
-                                Log.e("111","to do");
+                                Log.e("111", "to do");
                                 break;
                         }
                     }
@@ -84,6 +86,61 @@ public class MainActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+            }
+        }).start();
+
+    }
+
+
+    public void testHandler3() {
+        // 创建一个普通handler
+        final Handler mainhandler = new Handler();
+        // 创建一个handlerthread
+        final HandlerThread mhandlerThread = new HandlerThread("mythread");
+        mhandlerThread.start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                Looper.prepare();
+                 mhandler = new Handler(mhandlerThread.getLooper()) {
+                    @Override
+                    public void handleMessage(@NonNull Message msg) {
+                        super.handleMessage(msg);
+                        switch (msg.what) {
+                            case 1:
+                                // 在handlerthread里面依旧不能进行改变ui的操作!
+                                // 如果想要改变ui还是要使用looper.getMainLooper方法,
+                                // 但是如果使用了这个方法，基本和handlerthread无关了
+
+                                try {
+                                    Thread.sleep(4000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                               // textView.setText("66663");
+                                Log.e("22211", "to do");
+
+                                break;
+                        }
+                    }
+                };
+                Looper.loop();
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Message message = Message.obtain();
+                message.what = 1;
+                mhandler.sendMessage(message);
+
             }
         }).start();
 
