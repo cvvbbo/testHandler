@@ -188,7 +188,8 @@ public class MainActivity extends AppCompatActivity {
         final HandlerThread mhandlerThread = new HandlerThread("mythread");
         mhandlerThread.start();
        // mhandler = new Handler(mhandlerThread.getLooper()) { // 注释掉的这个是 handlerthread 的用法
-        mhandler = new Handler(mainhandler.getLooper()) {   // 如果想要更新ui需要是非子线程的handler
+       // mhandler = new Handler(mainhandler.getLooper()) {   // 如果想要更新ui需要是非子线程的handler
+        mhandler = new Handler(Looper.getMainLooper()) {   // 或者是使用 Looper.getMainLooper() 方法
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
