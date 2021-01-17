@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         textView = findViewById(R.id.tv);
-         testHandler4();
+         testHandler3();
 
        // initThread();
 
@@ -60,9 +60,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // 在子线程中使用handler改变ui的方法。
-    // 关键在于looper.prepare,looper.prepare,
-    // 以及handler中的looper.getmainlooper 方法。
+
+
+
+
+/**
+ *   在子线程中使用handler改变ui的方法。
+ *      关键在于looper.prepare,looper.prepare,
+ *      以及handler中的looper.getmainlooper 方法。
+ *     Looper.mylooper 方法是获取looper的方法
+ * ***/
+
     public void testHandler() {
         new Thread(new Runnable() {
             @Override
@@ -70,10 +78,15 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Looper.prepare();
                     Thread.sleep(3000);
+                    /**
+                     *
+                     * 如果这里想要改变ui，那么不能够，这里不能使用 Looper.myLooper() myLooper是获取looper的方法
+                     *
+                     * */
                     new Handler(Looper.myLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            //textView.setText("99999");
+                            textView.setText("99999");
                             Log.e("111", "to do");
                         }
                     });
@@ -87,6 +100,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     // 在子线程中创建handler，然后重写handlermessage
+    /**
+     *
+     *   即使在子线程中创建了handler ，也是子线程中的handler，而不是主线程（UI）线程的，所以无法改变ui
+     *   但是通过  Looper.prepare() 和  Looper.loop() 这样的组合是能够在子线程中开启handler并且发送消息
+     *
+     * **/
     public void testHandler1() {
         new Thread(new Runnable() {
             @Override
@@ -98,8 +117,8 @@ public class MainActivity extends AppCompatActivity {
                         super.handleMessage(msg);
                         switch (msg.what) {
                             case 1:
-                                // Log.e("111", "to do");
-                                textView.setText("99999");
+                                 Log.e("111", "to do");
+                                //textView.setText("2333");
 
                                 break;
                         }
